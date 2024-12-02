@@ -96,4 +96,4 @@ if model_file and data_file:
     st.pyplot(fig)
 
 else:
-    st.info("모델과 검증 데이터를 모두 업로드해야 검증을 진행할 수 있습니다.")
+    st.info("모델과 검증 데이터를 모두 업로드해야 검증을 진행할 수 있습니다!")
