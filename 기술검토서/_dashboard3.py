@@ -15,7 +15,7 @@ st.title("이진 분류 모델 성능 평가 서비스")
 # 1. 모델 업로드
 st.sidebar.header("1. 모델 및 벡터화 도구 업로드")
 model_file = st.sidebar.file_uploader("학습된 모델 업로드 (.pkl)", type=["pkl"])
-vectorizer_file = st.sidebar.file_uploader("벡터화 도구 업로드 (.pkl)", type=["pkl"])
+vectorizer_file = st.sidebar.file_uploader("벡터화 도구 업로드 (.pkl, 선택)", type=["pkl"])
 
 # 2. 검증 데이터 업로드
 st.sidebar.header("2. 검증 데이터 업로드")
@@ -25,11 +25,13 @@ data_file = st.sidebar.file_uploader("검증 데이터 업로드 (.csv)", type=[
 st.sidebar.header("3. F-beta 스코어 Beta 값 설정")
 beta_value = st.sidebar.number_input("Beta 값 입력 (\u03B2):", min_value=0.1, value=1.0, step=0.1)
 
-if model_file and vectorizer_file and data_file:
+if model_file and data_file:
     # 4. 모델 로드
     model = joblib.load(model_file)
-    vectorizer = joblib.load(vectorizer_file)
-    st.success("모델과 벡터화 도구가 성공적으로 로드되었습니다!")
+    vectorizer = joblib.load(vectorizer_file) if vectorizer_file else None
+    st.success("모델이 성공적으로 로드되었습니다!")
+    if vectorizer:
+        st.info("벡터화 도구도 성공적으로 로드되었습니다!")
 
     # 5. 검증 데이터 로드
     data = pd.read_csv(data_file)
@@ -37,17 +39,19 @@ if model_file and vectorizer_file and data_file:
     st.write(data.head())
 
     # 데이터 전처리
-    if "label" in data.columns and "review" in data.columns:
-        reviews = data["review"]  # 텍스트 입력
+    if "label" in data.columns:
         y_test = data["label"]  # 실제 레이블
+        if vectorizer and "review" in data.columns:
+            st.info("텍스트 데이터를 벡터화합니다.")
+            X_test = vectorizer.transform(data["review"])  # 텍스트 데이터 변환
+        else:
+            st.info("텍스트 데이터가 아니므로 그대로 사용합니다.")
+            X_test = data.drop(columns=["label"])  # 숫자형 데이터 그대로 사용
     else:
-        st.error("검증 데이터셋에 'review'와 'label' 열이 포함되어야 합니다.")
+        st.error("검증 데이터셋에 'label' 열이 포함되어야 합니다.")
         st.stop()
 
-    # 6. 텍스트 데이터를 벡터화
-    X_test = vectorizer.transform(reviews)
-
-    # 7. 모델 검증
+    # 6. 모델 검증
     st.subheader("모델 검증 결과")
     y_pred = model.predict(X_test)  # 모델 예측 수행
     y_prob = model.predict_proba(X_test)[:, 1]  # 양성 클래스 확률
@@ -101,4 +105,4 @@ if model_file and vectorizer_file and data_file:
     st.pyplot(fig)
 
 else:
-    st.info("모델, 벡터화 도구, 검증 데이터를 모두 업로드해야 검증을 진행할 수 있습니다!")
+    st.info("모델과 검증 데이터를 모두 업로드해야 검증을 진행할 수 있습니다!")
