@@ -1,1 +1,1 @@
-joblib @ file:///home/conda/feedstock_root/build_artifacts/joblib_1714665484399/work
+joblib
