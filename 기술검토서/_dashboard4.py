@@ -13,7 +13,7 @@ import numpy as np
 st.title("✨이진 분류 모델 성능 평가 서비스")
 
 # 1. 모델 업로드
-st.sidebar.header("📁 1. 모델 및 벡터화 도구 업로드")
+st.sidebar.header("📁 1. 모델/벡터화 파일 업로드")
 model_file = st.sidebar.file_uploader("🔍 학습된 모델 업로드 (.pkl)", type=["pkl"])
 vectorizer_file = st.sidebar.file_uploader("🧹 벡터화 도구 업로드 (.pkl, 선택)", type=["pkl"])
 
@@ -22,7 +22,7 @@ st.sidebar.header("📂 2. 검증 데이터 업로드")
 data_file = st.sidebar.file_uploader("📝 검증 데이터 업로드 (.csv)", type=["csv"])
 
 # 3. F-beta 스코어의 Beta 값 입력
-st.sidebar.header("⚙️ 3. F-beta 스코어 Beta 값 설정")
+st.sidebar.header("⚙️ (option) F-beta 스코어 Beta 값 설정")
 beta_value = st.sidebar.number_input("🎯 Beta 값 입력 (\u03B2):", min_value=0.1, value=1.0, step=0.1)
 
 if model_file and data_file:
@@ -31,7 +31,7 @@ if model_file and data_file:
     vectorizer = joblib.load(vectorizer_file) if vectorizer_file else None
     st.success("🎉 모델이 성공적으로 로드되었습니다!")
     if vectorizer:
-        st.info("🧩 벡터화 도구도 성공적으로 로드되었습니다!")
+        st.info("🧩 벡터화 도구가 성공적으로 로드되었습니다!")
 
     # 5. 검증 데이터 로드
     data = pd.read_csv(data_file)
